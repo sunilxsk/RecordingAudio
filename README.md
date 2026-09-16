@@ -205,15 +205,6 @@ gradle --refresh-dependencies assembleRelease
    -keep class com.arthenica.smartexception.** { *; }
    -keep class com.arthenica.ffmpegkit.** { *; }
    ```
-
----
-
-## 已知限制
-
-- 单键线控（多数原装有线耳机）在 Android 上的标准映射就是单击 = 播放/暂停、双击 = 下一曲、三击 = 上一曲，这是框架行为，非应用问题。
-- WAV / PCM 无标准封面槽位，写入封面图菜单会置灰。
-- 倒放超过 60MB 自动分段，分段点位于 60 秒边界，极少数情况下接缝处可能有微秒级误差。
-
 ---
 
 ## 开源许可
