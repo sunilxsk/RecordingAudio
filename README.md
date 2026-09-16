@@ -161,22 +161,17 @@ InternalRecordingAudio/
 // Material Design 3
 implementation "androidx.compose.material3:material3:1.3.0"
 
-// Media3（播放 + 通知栏媒体控件）
+// Media3
 implementation "androidx.media3:media3-session:1.4.0"
 implementation "androidx.media3:media3-exoplayer:1.4.0"
 implementation "androidx.media3:media3-common:1.4.0"
 
-// 音频编码（本地 AAR，远程已下架）
+// 音频编码
 implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
 implementation 'com.arthenica:smart-exception-java:0.2.1'
 implementation 'com.arthenica:smart-exception-common:0.2.1'
 
-// 图标：不引入 material-icons-*。
-// core 只有极少数图标，本工程需要的都不在里面；extended 有 5000+ 图标、体积极大。
-// 改为 ui/components/AppIcons.kt 用 Canvas 自绘，零依赖、零体积。
-```
-
-`minSdk` 为 **29**（AudioPlaybackCapture 自 Android 10 起提供）。
+`minSdk` 为 **29**
 
 ---
 
@@ -186,25 +181,6 @@ implementation 'com.arthenica:smart-exception-common:0.2.1'
 cd InternalRecordingAudio
 gradle --refresh-dependencies assembleRelease
 ```
-
-注意事项：
-
-1. 先把 `ffmpeg-kit-full-6.0-2.aar` 放进 `app/libs/`，否则 FFmpegKit 相关符号会 unresolved。
-2. Android 11+ 保存到 `/sdcard/Music/Internalrecording` 需要「所有文件访问权限」，「关于 → 权限 → 文件访问」可一键跳转；未授权时自动降级到应用专属目录。
-3. Android 14 起 `MediaProjection` 必须先启动 `mediaProjection` 类型的前台服务，`CaptureService` 已处理该顺序。
-4. full 包含四个 ABI，APK 体积较大；只发布 arm64 可在 `app/build.gradle` 加：
-   ```groovy
-   android { defaultConfig { ndk { abiFilters 'arm64-v8a' } } }
-   ```
-5. 若 `Media3` 报 `Unresolved reference: com.google.common`，补一行：
-   ```groovy
-   implementation 'com.google.guava:guava:33.2.1-android'
-   ```
-6. `proguard-rules.pro` 已保留：
-   ```proguard
-   -keep class com.arthenica.smartexception.** { *; }
-   -keep class com.arthenica.ffmpegkit.** { *; }
-   ```
 ---
 
 ## 开源许可
