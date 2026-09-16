@@ -92,12 +92,7 @@
 ### Media3 播放
 
 - `PlaybackService` 继承 `MediaSessionService`，ExoPlayer 开 `handleAudioFocus` 与 `handleAudioBecomingNoisy`，`MediaSession` 设 `setSessionActivity`；`onDestroy` 先释放 player 再释放 session。
-- `MediaItem` 只传 `mediaId`（存文件绝对路径），在 `MediaSession.Callback.onAddMediaItems()` 里还原为 Uri——绕开系统对跨进程 Uri 的安全剥离。
-- `Media3Player` 把 `MediaController` 的异步 IPC 包装成 StateFlow，UI 只与状态流打交道。
-- 整个目录一次性 `setMediaItems(items, startIndex, 0)`，上一曲/下一曲走原生 `seekToPreviousMediaItem()` / `seekToNextMediaItem()`。
-- 用 `ForwardingPlayer` 包一层传给 `MediaSession`，`getAvailableCommands()` 与 `isCommandAvailable()` 同时补上 next/previous，并在 `addListener()` 中主动重推一次补齐后的 commands，让 MediaSession 拿到正确值；`seekToNextMediaItem()` 兜底绕回第一首，按钮永不消失。
-- `MediaSession.Callback.onMediaButtonEvent()` 直接拦截线控：NEXT/SKIP_FORWARD → 下一首，PREVIOUS/SKIP_BACKWARD → 上一首，其余返回 false 交回默认处理。按键 DOWN/UP 配对去抖（800ms），避免一次按键切两首。
-- Manifest 声明 `FOREGROUND_SERVICE_MEDIA_PLAYBACK` 权限 + `foregroundServiceType="mediaPlayback"` + `exported="true"` + 固定 intent-filter `androidx.media3.session.MediaSessionService`。
+
 
 ### 悬浮窗
 
