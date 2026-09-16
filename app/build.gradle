@@ -1,0 +1,94 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.plugin.compose'
+}
+
+android {
+    namespace 'com.leoskyzwengmail.Internalrecordingaudio'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId "com.leoskyzwengmail.Internalrecordingaudio"
+        // AudioPlaybackCapture（内录）自 Android 10 (API 29) 起提供
+        minSdk 29
+        targetSdk 35
+        versionCode 1315
+        versionName "53.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    buildFeatures {
+        compose true
+    }
+
+    // AGP 7+ 推荐使用 packaging 代替 packagingOptions
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
+    }
+}
+
+// AGP 9.x 新 DSL：kotlin {} 与 android {} 平级
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+    }
+}
+
+dependencies {
+    // libs 目录下所有 jar / aar（ffmpeg-kit-full-6.0-2.aar 放这里）
+    implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
+
+    // ===== 崩溃修复关键：FFmpegKit 的运行时依赖 =====
+    // 本地引入 AAR 时它没有 POM，smart-exception 不会被自动传递。
+    // 缺失会在点击「结束」时崩溃：
+    //   java.lang.NoClassDefFoundError:
+    //   Failed resolution of: Lcom/arthenica/smartexception/java/Exceptions;
+    //     at com.arthenica.ffmpegkit.FFmpegKitConfig.<clinit>
+    // 两个都要：java 提供 Exceptions 类，common 是它的编译依赖。
+    implementation 'com.arthenica:smart-exception-java:0.2.1'
+    implementation 'com.arthenica:smart-exception-common:0.2.1'
+
+    // ---------- 播放：Jetpack Media3（MediaSession + ExoPlayer）----------
+    // MediaSessionService 会自动生成 MediaStyle 通知 → 状态栏/锁屏播放控件
+    def media3Version = '1.4.0'
+    implementation "androidx.media3:media3-exoplayer:${media3Version}"
+    implementation "androidx.media3:media3-session:${media3Version}"
+    implementation "androidx.media3:media3-common:${media3Version}"
+
+    // ---------- AndroidX 基础 ----------
+    implementation 'androidx.core:core-ktx:1.13.1'
+    implementation 'androidx.activity:activity-compose:1.9.3'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.7'
+    implementation 'androidx.lifecycle:lifecycle-runtime-compose:2.8.7'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7'
+
+    // ---------- Compose 版本统一 ----------
+    def composeVersion = '1.7.5'
+    implementation "androidx.compose.ui:ui:${composeVersion}"
+    implementation "androidx.compose.ui:ui-tooling-preview:${composeVersion}"
+    implementation "androidx.compose.foundation:foundation:${composeVersion}"
+    implementation "androidx.compose.material3:material3:1.3.0"
+
+    // 图标说明：material-icons-core 只含极少数「最常用」图标，
+    // 本工程所需图标不在其中，改为 ui/components/AppIcons.kt 自绘，故不引入图标库。
+    // 如需使用官方图标，可自行添加：androidx.compose.material:material-icons-extended:1.7.0
+
+    debugImplementation "androidx.compose.ui:ui-tooling:${composeVersion}"
+}

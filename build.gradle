@@ -1,0 +1,32 @@
+// 根构建脚本
+// 注意：AGP 9.x 已内置 Kotlin，不要再手动加 kotlin-gradle-plugin 的 classpath，
+// 否则会与内置 Kotlin 冲突（重复注册 kotlin 扩展）。
+buildscript {
+    ext {
+        agp_version = '9.4.0'
+        compose_version = '1.7.5'
+    }
+
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+
+    dependencies {
+        classpath "com.android.tools.build:gradle:${agp_version}"
+        // Kotlin 2.0 起 Compose 编译器以独立插件形式提供，版本需与 AGP 内置 Kotlin 一致
+        classpath "org.jetbrains.kotlin:compose-compiler-gradle-plugin:2.0.21"
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
